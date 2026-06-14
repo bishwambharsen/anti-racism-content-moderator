@@ -1,3 +1,15 @@
+// Check if running inside the Chrome Extension context
+if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
+  console.warn("Anti-Racism Content Reporter: Extension APIs not available. Please open this page via the extension origin.");
+  document.addEventListener('DOMContentLoaded', () => {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background: #ef4444; color: white; padding: 16px; text-align: center; font-weight: bold; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; font-family: sans-serif; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+    banner.innerHTML = '⚠️ <strong>Anti-Racism Content Reporter:</strong> Please open this page using the extension URL: <br><code style="background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 6px;">chrome-extension://YOUR_EXTENSION_ID/demo.html</code>';
+    document.body.appendChild(banner);
+  });
+  throw new Error("Anti-Racism Content Reporter: Extension APIs not available. Stopped execution.");
+}
+
 // Configuration & States
 let isEnabled = true;
 let customSelector = '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text';
