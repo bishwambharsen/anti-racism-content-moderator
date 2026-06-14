@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const defaults = {
     apiKey: '',
     threshold: 0.70,
-    selector: '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text'
+    selector: '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text, div[role="comment"] span[dir="auto"], ul li span'
   };
 
   // Update slider label

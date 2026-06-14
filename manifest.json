@@ -14,7 +14,9 @@
       "matches": [
         "*://*.reddit.com/*",
         "*://*.x.com/*",
-        "*://*.twitter.com/*"
+        "*://*.twitter.com/*",
+        "*://*.facebook.com/*",
+        "*://*.instagram.com/*"
       ],
       "js": ["content.js"],
       "css": ["styles.css"],

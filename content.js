@@ -86,6 +86,14 @@ function getCommentContainer(el) {
   if (el.closest('shreddit-comment')) {
     return el.closest('shreddit-comment');
   }
+  // Facebook
+  if (el.closest('div[role="comment"]')) {
+    return el.closest('div[role="comment"]');
+  }
+  // Instagram
+  if (el.closest('ul li')) {
+    return el.closest('li');
+  }
   // Reddit Old / Legacy / General
   return el.closest('[data-testid="comment"]') || el.closest('.comment') || el;
 }
@@ -185,6 +193,11 @@ async function startAutomatedReport(container, button) {
       await runRedditReportFlow(container, status);
     } else if (container.closest('article[data-testid="tweet"]')) {
       await runXReportFlow(container, status);
+    } else if (window.location.hostname.includes('facebook.com') || window.location.hostname.includes('instagram.com')) {
+      status.textContent = 'Report manually via options menu.';
+      status.className = 'moderator-report-status error';
+      button.disabled = false;
+      alert("Due to security constraints on Meta platforms, please click the comment's options (three dots) menu to report manually.");
     } else {
       throw new Error("Target platform automated reporting not supported on this page.");
     }
