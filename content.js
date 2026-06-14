@@ -1,12 +1,6 @@
 // Check if running inside the Chrome Extension context
 if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
   console.warn("Anti-Racism Content Reporter: Extension APIs not available. Please open this page via the extension origin.");
-  document.addEventListener('DOMContentLoaded', () => {
-    const banner = document.createElement('div');
-    banner.style.cssText = 'background: #ef4444; color: white; padding: 16px; text-align: center; font-weight: bold; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; font-family: sans-serif; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
-    banner.innerHTML = '⚠️ <strong>Anti-Racism Content Reporter:</strong> Please open this page using the extension URL: <br><code style="background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 6px;">chrome-extension://YOUR_EXTENSION_ID/demo.html</code>';
-    document.body.appendChild(banner);
-  });
   throw new Error("Anti-Racism Content Reporter: Extension APIs not available. Stopped execution.");
 }
 
@@ -14,18 +8,27 @@ if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
 let isEnabled = true;
 let customSelector = '.comment, [data-testid="tweetText"], .reddit-comment, div[data-testid="comment"], shreddit-comment [id^="comment-content-"], .comment-body, .usertext-body, div[role="comment"] span[dir="auto"], ul li span';
 let confidenceThreshold = 0.70;
+let requestDelay = 4500; // default 4.5 seconds for Free Tier RPM limits
 let scanTimeout = null;
+
+// Observers and Queue state
+const analysisQueue = [];
+let isProcessingQueue = false;
+let observer = null;
+let intersectionObserver = null;
 
 // Load initial settings
 chrome.storage.local.get({
   enabled: true,
   selector: '.comment, [data-testid="tweetText"], .reddit-comment, div[data-testid="comment"], shreddit-comment [id^="comment-content-"], .comment-body, .usertext-body, div[role="comment"] span[dir="auto"], ul li span',
-  threshold: 0.70
+  threshold: 0.70,
+  requestDelay: 4500
 }, (items) => {
   isEnabled = items.enabled;
   customSelector = items.selector;
   confidenceThreshold = items.threshold;
-  console.log("Anti-Racism Content Reporter: Extension loaded on page. Active Selector:", customSelector);
+  requestDelay = items.requestDelay;
+  console.log("Anti-Racism Content Reporter: Extension loaded on page. Active Selector:", customSelector, "Pacing:", requestDelay, "ms");
   if (isEnabled) {
     initModerator();
   }
@@ -38,6 +41,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (isEnabled) {
       scanNewComments();
     } else {
+      // Clear queue and observers on disable
+      analysisQueue.length = 0;
+      isProcessingQueue = false;
+      if (intersectionObserver) {
+        intersectionObserver.disconnect();
+      }
       removeHighlights();
     }
   }
@@ -45,7 +54,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Helper: sleep with randomized human-like jitter
 const sleep = (ms) => {
-  const jitter = Math.random() * 250; // Add 0-250ms of variance
+  const jitter = Math.random() * 250;
   return new Promise(resolve => setTimeout(resolve, ms + jitter));
 };
 
@@ -67,7 +76,6 @@ function humanClick(element) {
     screenY: y + window.screenY
   };
 
-  // Dispatch mousedown -> mouseup -> click sequence
   element.dispatchEvent(new MouseEvent('mousedown', eventOpts));
   element.dispatchEvent(new MouseEvent('mouseup', eventOpts));
   element.dispatchEvent(new MouseEvent('click', eventOpts));
@@ -97,43 +105,112 @@ function getCommentContainer(el) {
 
 // Scrape and analyze newly added elements
 function scanNewComments() {
-  if (!isEnabled) return;
+  if (!isEnabled || !intersectionObserver) return;
 
   const commentTextElements = document.querySelectorAll(customSelector);
-  
-  // Log count of found items to page console for visual feedback
-  if (commentTextElements.length > 0) {
-    const unprocessed = Array.from(commentTextElements).filter(el => el.getAttribute('data-moderator-processed') !== 'true');
-    if (unprocessed.length > 0) {
-      console.log(`Anti-Racism Content Reporter: Scanning page... Found ${commentTextElements.length} comments total (${unprocessed.length} new unprocessed).`);
-    }
-  }
+  let newCount = 0;
 
   commentTextElements.forEach(el => {
     // Avoid double processing
     if (el.getAttribute('data-moderator-processed') === 'true') return;
     el.setAttribute('data-moderator-processed', 'true');
 
-    const text = el.textContent.trim();
-    if (!text || text.length < 5) return;
+    // Watch the element. It will only be added to queue once scrolled into view.
+    intersectionObserver.observe(el);
+    newCount++;
+  });
 
-    // Send comment to background worker for Gemini classification
-    chrome.runtime.sendMessage({ action: 'analyzeText', text }, (response) => {
-      if (chrome.runtime.lastError) {
-        console.warn("Anti-Racism Content Reporter: Failed to contact background worker:", chrome.runtime.lastError.message);
-        return;
-      }
+  if (newCount > 0) {
+    console.log(`Anti-Racism Content Reporter: Found ${newCount} new comments. Observing viewport intersection...`);
+  }
+}
+
+// ----------------------------------------------------
+// Paced Request Queue & Viewport Triggering
+// ----------------------------------------------------
+function enqueueComment(el, text) {
+  analysisQueue.push({ el, text });
+  showQueueBadge(el);
+  processQueue();
+}
+
+async function processQueue() {
+  if (isProcessingQueue || analysisQueue.length === 0) return;
+  isProcessingQueue = true;
+
+  while (analysisQueue.length > 0) {
+    const { el, text } = analysisQueue.shift();
+    updateQueueBadge(el, 'Scanning...');
+
+    try {
+      const response = await sendAnalysisRequest(text);
+      removeQueueBadge(el);
 
       if (response && response.success) {
-        console.log(`Anti-Racism Content Reporter: Classification result for "${text.substring(0, 30)}...":`, response.result);
+        console.log(`Anti-Racism Content Reporter: Scanned "${text.substring(0, 30)}...":`, response.result);
         if (response.result.isFlagged) {
           flagComment(el, response.result);
         }
       } else {
-        console.error("Anti-Racism Content Reporter: API classification failed:", response ? response.error : "No response");
+        console.error("Anti-Racism Content Reporter: API analysis failed:", response ? response.error : "No response");
+      }
+    } catch (err) {
+      console.error("Anti-Racism Content Reporter: Queue processor error:", err);
+      removeQueueBadge(el);
+    }
+
+    // Space out requests by custom requestDelay to respect rate limits
+    if (requestDelay > 0 && analysisQueue.length > 0) {
+      await new Promise(resolve => setTimeout(resolve, requestDelay));
+    }
+  }
+
+  isProcessingQueue = false;
+  // Trigger again if new items arrived while queue was finalizing
+  if (analysisQueue.length > 0) {
+    processQueue();
+  }
+}
+
+function sendAnalysisRequest(text) {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ action: 'analyzeText', text }, (response) => {
+      if (chrome.runtime.lastError) {
+        resolve({ success: false, error: chrome.runtime.lastError.message });
+      } else {
+        resolve(response);
       }
     });
   });
+}
+
+// Status Badges for Pacing Feedback
+function showQueueBadge(el) {
+  const container = getCommentContainer(el);
+  if (!container || container.querySelector('.moderator-queue-badge')) return;
+
+  const badge = document.createElement('span');
+  badge.className = 'moderator-queue-badge';
+  badge.innerHTML = '⏳ Waiting...';
+  badge.style.cssText = 'font-size: 11px; color: #64748b; font-weight: 500; margin-top: 6px; display: inline-block; font-family: sans-serif;';
+  container.appendChild(badge);
+}
+
+function updateQueueBadge(el, text) {
+  const container = getCommentContainer(el);
+  if (!container) return;
+  const badge = container.querySelector('.moderator-queue-badge');
+  if (badge) {
+    badge.innerHTML = `🔍 ${text}`;
+    badge.style.color = '#3b82f6';
+  }
+}
+
+function removeQueueBadge(el) {
+  const container = getCommentContainer(el);
+  if (!container) return;
+  const badge = container.querySelector('.moderator-queue-badge');
+  if (badge) badge.remove();
 }
 
 // Apply highlighting and inject Quick Report button
@@ -178,6 +255,7 @@ function removeHighlights() {
     el.classList.remove('moderator-flagged-comment', 'animate-flag');
   });
   document.querySelectorAll('.moderator-report-container').forEach(el => el.remove());
+  document.querySelectorAll('.moderator-queue-badge').forEach(el => el.remove());
   document.querySelectorAll('[data-moderator-processed]').forEach(el => {
     el.removeAttribute('data-moderator-processed');
   });
@@ -304,9 +382,28 @@ async function runXReportFlow(container, status) {
 // Extension Initialization and Observation
 // ----------------------------------------------------
 function initModerator() {
+  // Set up IntersectionObserver for viewport lazy loading
+  intersectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        intersectionObserver.unobserve(el); // Stop observing once it enters viewport
+
+        const text = el.textContent.trim();
+        if (text && text.length >= 5) {
+          enqueueComment(el, text);
+        }
+      }
+    });
+  }, {
+    root: null, // browser viewport
+    rootMargin: '0px 0px 200px 0px', // start scanning 200px before scrolling in
+    threshold: 0.1
+  });
+
   scanNewComments();
 
-  const observer = new MutationObserver((mutations) => {
+  observer = new MutationObserver((mutations) => {
     if (!isEnabled) return;
     
     clearTimeout(scanTimeout);

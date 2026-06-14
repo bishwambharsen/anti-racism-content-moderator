@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const apiKeyInput = document.getElementById('api-key');
   const thresholdInput = document.getElementById('threshold');
   const thresholdVal = document.getElementById('threshold-val');
+  const requestDelayInput = document.getElementById('request-delay');
   const selectorInput = document.getElementById('custom-selector');
   const settingsForm = document.getElementById('settings-form');
   const btnReset = document.getElementById('btn-reset');
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const defaults = {
     apiKey: '',
     threshold: 0.70,
+    requestDelay: 4500,
     selector: '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text, div[role="comment"] span[dir="auto"], ul li span'
   };
 
@@ -25,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
       apiKeyInput.value = items.apiKey;
       thresholdInput.value = items.threshold;
       thresholdVal.textContent = parseFloat(items.threshold).toFixed(2);
+      requestDelayInput.value = items.requestDelay;
       selectorInput.value = items.selector;
     });
   };
@@ -35,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const settings = {
       apiKey: apiKeyInput.value.trim(),
       threshold: parseFloat(thresholdInput.value),
+      requestDelay: parseInt(requestDelayInput.value) || 0,
       selector: selectorInput.value.trim()
     };
 

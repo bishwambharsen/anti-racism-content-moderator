@@ -84,7 +84,7 @@
       line-height: 1.4;
     }
 
-    input[type="text"], input[type="password"] {
+    input[type="text"], input[type="password"], input[type="number"] {
       width: 100%;
       padding: 10px 14px;
       background: #0b0f19;
@@ -96,7 +96,7 @@
       transition: border-color 0.2s;
     }
 
-    input[type="text"]:focus, input[type="password"]:focus {
+    input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus {
       outline: none;
       border-color: var(--accent);
     }
@@ -203,6 +203,12 @@
           <input type="range" id="threshold" min="0" max="1" step="0.05" value="0.7">
           <span class="slider-value" id="threshold-val">0.70</span>
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request-delay">API Request Pacing (ms)</label>
+        <div class="description">Time interval (in milliseconds) to wait between scanning comments. Essential to stay under the 15 Requests Per Minute (RPM) limit on Gemini's Free Tier (use 4500ms). Set to 0 if you have a paid key with higher quotas.</div>
+        <input type="number" id="request-delay" min="0" max="15000" step="500" value="4500">
       </div>
 
       <div class="form-group">
