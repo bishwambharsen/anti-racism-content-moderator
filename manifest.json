@@ -29,7 +29,7 @@
   "options_page": "options.html",
   "web_accessible_resources": [
     {
-      "resources": ["demo.html", "styles.css", "content.js"],
+      "resources": ["demo.html", "styles.css", "content.js", "demo.js"],
       "matches": ["<all_urls>"]
     }
   ]
