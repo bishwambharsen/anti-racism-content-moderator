@@ -6,7 +6,7 @@ if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
 
 // Configuration & States
 let isEnabled = true;
-let customSelector = '.comment, [data-testid="tweetText"], .reddit-comment, div[data-testid="comment"], shreddit-comment [id^="comment-content-"], .comment-body, .usertext-body, div[role="comment"] span[dir="auto"], ul li span';
+let customSelector = '.comment, [data-testid="tweetText"], .reddit-comment, div[data-testid="comment"], shreddit-comment [id^="comment-content-"], .comment-body, .usertext-body, div[role="comment"] span[dir="auto"], article ul li span, div[role="dialog"] ul li span';
 let confidenceThreshold = 0.70;
 let requestDelay = 4500; // default 4.5 seconds for Free Tier RPM limits
 let scanTimeout = null;
@@ -20,7 +20,7 @@ let intersectionObserver = null;
 // Load initial settings
 chrome.storage.local.get({
   enabled: true,
-  selector: '.comment, [data-testid="tweetText"], .reddit-comment, div[data-testid="comment"], shreddit-comment [id^="comment-content-"], .comment-body, .usertext-body, div[role="comment"] span[dir="auto"], ul li span',
+  selector: '.comment, [data-testid="tweetText"], .reddit-comment, div[data-testid="comment"], shreddit-comment [id^="comment-content-"], .comment-body, .usertext-body, div[role="comment"] span[dir="auto"], article ul li span, div[role="dialog"] ul li span',
   threshold: 0.70,
   requestDelay: 4500
 }, (items) => {

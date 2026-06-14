@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     model: 'gemini-2.0-flash-lite',
     threshold: 0.70,
     requestDelay: 4500,
-    selector: '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text, div[role="comment"] span[dir="auto"], ul li span'
+    selector: '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text, div[role="comment"] span[dir="auto"], article ul li span, div[role="dialog"] ul li span'
   };
 
   // Update slider label
