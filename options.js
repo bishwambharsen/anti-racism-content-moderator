@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const apiKeyInput = document.getElementById('api-key');
+  const geminiModelInput = document.getElementById('gemini-model');
   const thresholdInput = document.getElementById('threshold');
   const thresholdVal = document.getElementById('threshold-val');
   const requestDelayInput = document.getElementById('request-delay');
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Default values
   const defaults = {
     apiKey: '',
+    model: 'gemini-2.0-flash-lite',
     threshold: 0.70,
     requestDelay: 4500,
     selector: '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text, div[role="comment"] span[dir="auto"], ul li span'
@@ -25,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadSettings = () => {
     chrome.storage.local.get(defaults, (items) => {
       apiKeyInput.value = items.apiKey;
+      geminiModelInput.value = items.model;
       thresholdInput.value = items.threshold;
       thresholdVal.textContent = parseFloat(items.threshold).toFixed(2);
       requestDelayInput.value = items.requestDelay;
@@ -37,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const settings = {
       apiKey: apiKeyInput.value.trim(),
+      model: geminiModelInput.value,
       threshold: parseFloat(thresholdInput.value),
       requestDelay: parseInt(requestDelayInput.value) || 0,
       selector: selectorInput.value.trim()
