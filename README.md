@@ -74,3 +74,10 @@ To keep the moderator extension undetected by platform scrapers and anti-bot sys
 2. **Realistic Coordinates**: Event objects calculate element center positions dynamically, supplying accurate `clientX` and `clientY` coordinates.
 3. **Randomized Human Jitter**: Action intervals are padded with randomized delays (`Math.random() * 250`), introducing timing inconsistencies that break bot-like click rhythms.
 4. **Human-in-the-Loop Safeguard**: The script halts immediately before the final "Submit" button, ensuring an actual human operator triggers the final network request.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
