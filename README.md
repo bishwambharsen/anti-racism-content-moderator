@@ -1,4 +1,4 @@
-# 🛡️ Semi-Automated Social Media Content Moderator (Anti-Indian/Anti-Hindu Filter)
+# 🛡️ Anti-Racism Content Reporter (Anti-Indian/Anti-Hindu Filter)
 
 A premium Manifest V3 Chrome Extension designed to detect, highlight, and facilitate quick reporting of anti-Indian racism and anti-Hindu religious hate speech on major social platforms (like Reddit and X/Twitter). 
 

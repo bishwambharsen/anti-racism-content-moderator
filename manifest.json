@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Semi-Automated Content Moderator",
+  "name": "Anti-Racism Content Reporter",
   "version": "1.0",
   "description": "Scans social media comments, flags hate speech using local rules or an LLM API, and facilitates quick reporting.",
   "permissions": [
