@@ -1,0 +1,75 @@
+/* Custom styling for flagged comments */
+.moderator-flagged-comment {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  border-left: 4px solid #ef4444 !important;
+  transition: background-color 0.3s ease, border-left-color 0.3s ease;
+  position: relative;
+}
+
+/* Quick Report Button container & button */
+.moderator-report-container {
+  display: inline-flex;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.moderator-report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ef4444;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.moderator-report-btn:hover {
+  background-color: #dc2626;
+  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
+}
+
+.moderator-report-btn:active {
+  background-color: #b91c1c;
+  transform: translateY(0);
+}
+
+/* Confidence indicator badge */
+.moderator-confidence-badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Report Status styling */
+.moderator-report-status {
+  margin-left: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  align-self: center;
+  color: #ef4444;
+}
+
+.moderator-report-status.success {
+  color: #10b981;
+}
+
+/* Animation for highlight */
+@keyframes pulseHighlight {
+  0% { background-color: rgba(239, 68, 68, 0.05); }
+  50% { background-color: rgba(239, 68, 68, 0.15); }
+  100% { background-color: rgba(239, 68, 68, 0.08); }
+}
+
+.moderator-flagged-comment.animate-flag {
+  animation: pulseHighlight 1.5s ease-out 1;
+}

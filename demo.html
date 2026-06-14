@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moderator Test Thread</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: #151d30;
+      --border-color: #24324f;
+      --text-main: #f8fafc;
+      --text-muted: #64748b;
+      --accent: #ef4444;
+      --accent-hover: #dc2626;
+      --bg-modal: rgba(15, 23, 42, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .info-card {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .info-card h4 {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #60a5fa;
+    }
+
+    .thread-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* Mock comment thread */
+    .comments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mock-comment {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+      transition: background-color 0.2s;
+    }
+
+    .mock-comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #3b82f6;
+    }
+
+    .username {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .timestamp {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .mock-comment-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e2e8f0;
+    }
+
+    /* Dropdown elements */
+    .menu-container {
+      position: relative;
+    }
+
+    .mock-menu-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    .mock-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+
+    .mock-comment-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      min-width: 130px;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .mock-dropdown-item {
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: background-color 0.1s;
+    }
+
+    .mock-dropdown-item:hover {
+      background-color: #334155;
+    }
+
+    .mock-dropdown-item.report-trigger {
+      color: var(--accent);
+    }
+
+    .mock-dropdown-item.report-trigger:hover {
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg-modal);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #1e293b;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 450px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .modal-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .modal-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.15);
+      transition: border-color 0.2s;
+    }
+
+    .modal-option:hover {
+      border-color: #475569;
+    }
+
+    .modal-option input[type="radio"] {
+      accent-color: var(--accent);
+    }
+
+    .modal-option-label {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .mock-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+
+    .mock-btn-next, .mock-btn-submit {
+      background: var(--accent);
+      color: white;
+    }
+
+    .mock-btn-next:hover, .mock-btn-submit:hover {
+      background: var(--accent-hover);
+    }
+
+    .mock-btn-cancel, .mock-btn-back {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .mock-btn-cancel:hover, .mock-btn-back:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🛡️ Social Media Feed Mockup</h1>
+      <div class="subtitle">Use this local environment to test detection, highlighting, and click simulation safely.</div>
+    </header>
+
+    <div class="info-card">
+      <h4>💡 Sandbox Instructions:</h4>
+      <p>1. Open this page by double-clicking it, or via the unpacked extension files.</p>
+      <p>2. If loaded unpacked, the content script automatically scans this page. Comments 3 and 5 will be highlighted because they trigger keywords.</p>
+      <p>3. Click <strong>"⚠️ Quick Report"</strong>. You will watch the moderator script simulate natural clicks to trigger the menu and complete the report categories, stopping right at the final submit screen.</p>
+    </div>
+
+    <div class="thread-title">Discussion Thread: "Public Policy and Global Issues"</div>
+
+    <div class="comments-list">
+      <!-- Comment 1 (Clean) -->
+      <div class="mock-comment">
+        <div class="mock-comment-header">
+          <div class="author-info">
+            <div class="avatar" style="background: #10b981;"></div>
+            <span class="username">TechEnthusiast_99</span>
+            <span class="timestamp">2h ago</span>
+          </div>
+          <div class="menu-container">
+            <button class="mock-menu-btn">•••</button>
+            <div class="mock-comment-dropdown">
+              <div class="mock-dropdown-item">Share Link</div>
+              <div class="mock-dropdown-item">Save Comment</div>
+              <div class="mock-dropdown-item report-trigger">Report Comment</div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-comment-text">
+          I really appreciate the research details added here. The transition to clean energy seems inevitable but requires massive policy alignment.
+        </div>
+      </div>
+
+      <!-- Comment 2 (Clean) -->
+      <div class="mock-comment">
+        <div class="mock-comment-header">
+          <div class="author-info">
+            <div class="avatar" style="background: #f59e0b;"></div>
+            <span class="username">GlobalThinker</span>
+            <span class="timestamp">1h ago</span>
+          </div>
+          <div class="menu-container">
+            <button class="mock-menu-btn">•••</button>
+            <div class="mock-comment-dropdown">
+              <div class="mock-dropdown-item">Share Link</div>
+              <div class="mock-dropdown-item">Save Comment</div>
+              <div class="mock-dropdown-item report-trigger">Report Comment</div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-comment-text">
+          There are critical bottlenecks in infrastructure that we cannot ignore. Let's look at battery grids.
+        </div>
+      </div>
+
+      <!-- Comment 3 (Triggers Regex: Hate speech test) -->
+      <div class="mock-comment">
+        <div class="mock-comment-header">
+          <div class="author-info">
+            <div class="avatar" style="background: #3b82f6;"></div>
+            <span class="username">TrollBusterX</span>
+            <span class="timestamp">45m ago</span>
+          </div>
+          <div class="menu-container">
+            <button class="mock-menu-btn">•••</button>
+            <div class="mock-comment-dropdown">
+              <div class="mock-dropdown-item">Share Link</div>
+              <div class="mock-dropdown-item">Save Comment</div>
+              <div class="mock-dropdown-item report-trigger">Report Comment</div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-comment-text">
+          This is a test hate speech comment. I am testing the plugin classifier regex system.
+        </div>
+      </div>
+
+      <!-- Comment 4 (Anti-racism discussion, should not match) -->
+      <div class="mock-comment">
+        <div class="mock-comment-header">
+          <div class="author-info">
+            <div class="avatar" style="background: #8b5cf6;"></div>
+            <span class="username">AllySupport</span>
+            <span class="timestamp">30m ago</span>
+          </div>
+          <div class="menu-container">
+            <button class="mock-menu-btn">•••</button>
+            <div class="mock-comment-dropdown">
+              <div class="mock-dropdown-item">Share Link</div>
+              <div class="mock-dropdown-item">Save Comment</div>
+              <div class="mock-dropdown-item report-trigger">Report Comment</div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-comment-text">
+          We must address systemic inequality directly. I hate racism and xenophobic ideas.
+        </div>
+      </div>
+
+      <!-- Comment 5 (Triggers Regex: Xenophobia) -->
+      <div class="mock-comment">
+        <div class="mock-comment-header">
+          <div class="author-info">
+            <div class="avatar" style="background: #ec4899;"></div>
+            <span class="username">AngryUser88</span>
+            <span class="timestamp">10m ago</span>
+          </div>
+          <div class="menu-container">
+            <button class="mock-menu-btn">•••</button>
+            <div class="mock-comment-dropdown">
+              <div class="mock-dropdown-item">Share Link</div>
+              <div class="mock-dropdown-item">Save Comment</div>
+              <div class="mock-dropdown-item report-trigger">Report Comment</div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-comment-text">
+          Those immigrants are taking all of our resources. They need to go back to where they came from!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mock Report Dialog Modal -->
+  <div class="modal-overlay" id="mock-report-modal">
+    <div class="modal-content">
+      <div id="step-1">
+        <div class="modal-header">Submit a Report</div>
+        <div class="modal-options-list">
+          <label class="modal-option">
+            <input type="radio" name="mock-report-category" value="spam">
+            <span class="modal-option-label">Spam & Abuse</span>
+          </label>
+          <label class="modal-option">
+            <input type="radio" name="mock-report-category" value="harassment">
+            <span class="modal-option-label">Harassment</span>
+          </label>
+          <label class="modal-option">
+            <input type="radio" name="mock-report-category" value="hate_speech">
+            <span class="modal-option-label">Hate Speech & Racism</span>
+          </label>
+          <label class="modal-option">
+            <input type="radio" name="mock-report-category" value="misinformation">
+            <span class="modal-option-label">Misinformation</span>
+          </label>
+        </div>
+        <div class="modal-footer">
+          <button class="mock-btn mock-btn-cancel" id="btn-cancel-report">Cancel</button>
+          <button class="mock-btn mock-btn-next" id="btn-next-step">Continue</button>
+        </div>
+      </div>
+
+      <div id="step-2" style="display: none;">
+        <div class="modal-header">Confirm Report Submission</div>
+        <p style="font-size: 13px; margin-bottom: 20px; line-height: 1.5; color: #cbd5e1;">
+          You are about to report this comment for violating rules on <strong>Hate Speech & Racism</strong>. Our human moderators will review it.
+        </p>
+        <div class="modal-footer">
+          <button class="mock-btn mock-btn-back" id="btn-back-step">Back</button>
+          <button class="mock-btn mock-btn-submit" id="btn-submit-report" style="background-color: #ef4444;">Submit Report</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Simple interaction triggers in the mock document -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('mock-report-modal');
+      const step1 = document.getElementById('step-1');
+      const step2 = document.getElementById('step-2');
+      const dropdowns = document.querySelectorAll('.mock-comment-dropdown');
+
+      // Dropdown opening toggles
+      document.querySelectorAll('.mock-menu-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const dropdown = btn.nextElementSibling;
+          const isShowing = dropdown.style.display === 'block';
+          dropdowns.forEach(d => d.style.display = 'none');
+          dropdown.style.display = isShowing ? 'none' : 'block';
+        });
+      });
+
+      // Close dropdowns on body clicks
+      document.addEventListener('click', () => {
+        dropdowns.forEach(d => d.style.display = 'none');
+      });
+
+      // Clicking report trigger inside the comment context menu
+      document.querySelectorAll('.report-trigger').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dropdowns.forEach(d => d.style.display = 'none');
+          // Reset modal screens
+          step1.style.display = 'block';
+          step2.style.display = 'none';
+          modal.style.display = 'flex';
+        });
+      });
+
+      // Modal buttons
+      document.getElementById('btn-cancel-report').addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      document.getElementById('btn-next-step').addEventListener('click', () => {
+        step1.style.display = 'none';
+        step2.style.display = 'block';
+      });
+
+      document.getElementById('btn-back-step').addEventListener('click', () => {
+        step1.style.display = 'block';
+        step2.style.display = 'none';
+      });
+
+      document.getElementById('btn-submit-report').addEventListener('click', () => {
+        alert('Thank you! Report submitted successfully.');
+        modal.style.display = 'none';
+      });
+    });
+  </script>
+
+  <!-- Load content script (in webpage mode, it runs fallback mocks automatically) -->
+  <script src="content.js" defer></script>
+</body>
+</html>
