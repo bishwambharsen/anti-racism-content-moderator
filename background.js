@@ -6,7 +6,7 @@ const LOCAL_REGEX_RULES = [
     reason: "Test keyword match"
   },
   {
-    pattern: /\b(go back to (your|where you came) country|illegal alien|sub-?human)\b/i,
+    pattern: /\b(go back to (your country|where (you|they) came from)|illegal alien|sub-?human)\b/i,
     score: 0.90,
     reason: "Xenophobic trope detected"
   },
