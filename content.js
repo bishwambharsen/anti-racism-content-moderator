@@ -11,10 +11,12 @@ if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.sendMess
     runtime: {
       sendMessage: (msg, cb) => {
         if (msg.action === 'analyzeText') {
-          // Fallback keyword checker for direct webpage double-click testing
+          // Fallback keyword checker for direct webpage double-click testing (focused on anti-Indian/anti-Hindu comments)
           const localRules = [
             { pattern: /test hate speech/i, score: 0.95 },
-            { pattern: /go back to (your country|where (you|they) came from)/i, score: 0.90 }
+            { pattern: /(pajeet|curry-?muncher|street-?shitter|cow-?worshipper|cow-?piss)/i, score: 0.95 },
+            { pattern: /(dirty indian|scamming indian|smelly indian)/i, score: 0.90 },
+            { pattern: /(dirty pagan|worship.*idol|worship.*statue)/i, score: 0.95 }
           ];
           let isFlagged = false;
           let confidenceScore = 0;

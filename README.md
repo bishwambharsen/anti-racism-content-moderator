@@ -1,20 +1,20 @@
-# 🛡️ Semi-Automated Social Media Content Moderator (Manifest V3)
+# 🛡️ Semi-Automated Social Media Content Moderator (Anti-Indian/Anti-Hindu Filter)
 
-A premium Chrome Extension designed to scan, flag, and facilitate the reporting of hate speech, racism, and xenophobic content on major social platforms (like Reddit and X/Twitter). The extension incorporates a human-in-the-loop automation flow, enabling quick manual reviews before dispatching reports.
+A premium Manifest V3 Chrome Extension designed to detect, highlight, and facilitate quick reporting of anti-Indian racism and anti-Hindu religious hate speech on major social platforms (like Reddit and X/Twitter). The extension fills a gap in platform-native moderation by targeting slurs, xenophobic tropes, and religious bigotry often missed by general moderation algorithms.
 
 ---
 
 ## ✨ Features
 
-- **Manifest V3 Compliant**: Uses modern service workers, background scripting, and secure content script environments.
-- **Real-Time Scanning**: Leverages a debounced `MutationObserver` to efficiently scan comments on page load and during infinite scroll without hurting performance.
-- **Dual Classification Engine**:
-  - **Option A (Local Check)**: Lightweight, offline keyword matching using regular expressions.
-  - **Option B (Cloud LLM)**: Advanced semantic classification powered by **OpenAI (GPT-4o-mini)** or **Google Gemini (Gemini 1.5 Flash)** with custom confidence thresholds.
-- **Premium UI Highlights**: Flagged comments are subtly tinted in translucent red with an injected "⚠️ Quick Report" badge showing the AI's confidence score.
-- **Human-in-the-Loop Report Automator**: Automates navigating the target platform's multi-step reporting modals, choosing category options, and halting right before final submission to allow human verification.
-- **Anti-Bot Avoidance**: Dispatches realistic mouse pointer events with randomized jitter timeouts to prevent website anti-bot systems from flagging automation.
-- **Local Testing Sandbox**: Includes a fully interactive, self-contained mock feed (`demo.html`) with a working dropdown options menu and report modal.
+- **Manifest V3 Compliant**: Developed using service worker architecture and secure content scripts.
+- **Specialized Detection Engine**:
+  - **Option A (Local Check)**: Lightweight regex rules targeting common anti-Indian slurs (e.g. *pajeet*, *curry-muncher*, hygiene tropes) and anti-Hindu religious intolerance.
+  - **Option B (Cloud LLM)**: Connects to **OpenAI (GPT-4o-mini)** or **Google Gemini (Gemini 1.5 Flash)** with custom system prompts that direct the AI to analyze subtle context, xenophobia, and dog whistles targeting South Asian/Hindu demographics.
+- **Real-Time Scanning**: Uses a debounced `MutationObserver` to automatically scan comments during scroll/navigation.
+- **Premium UI Highlights**: Visually tints violating comments in a soft translucent red and injects a "⚠️ Quick Report" button displaying the detection confidence.
+- **Human-in-the-Loop Report Automator**: Automatically clicks open options menus, selects "Hate Speech" in the native platform report flow, and halts right before final submission.
+- **Anti-Bot Avoidance**: Dispatches coordinates-based pointer events with randomized jitter delays.
+- **Local Testing Sandbox**: Includes a fully interactive sandbox (`demo.html`) pre-loaded with anti-Indian/anti-Hindu comments, neutral control comments, and simulated reporting modals.
 
 ---
 
@@ -49,9 +49,9 @@ A premium Chrome Extension designed to scan, flag, and facilitate the reporting 
 
 To safely test the extension without making edits on live social accounts:
 1. Double-click the `demo.html` file in the project folder to open it in Chrome.
-2. Observe the page. Comments containing racist keywords or test speech will automatically highlight.
-3. Click **⚠️ Quick Report** on any flagged comment. 
-4. Watch the script automatically click open options, choose "Hate Speech & Racism" in the modal, advance the screen, and halt for final review.
+2. Observe the page. Comments 3 (anti-Indian slur/scam stereotype) and 5 (anti-Hindu religious bigotry) will automatically highlight, while comments 1, 2, and 4 (including positive and anti-racism references to India/Hinduism) remain untouched to verify there are no false positives.
+3. Click **⚠️ Quick Report** on either flagged comment. 
+4. Watch the script automatically click open the comment dropdown menu, select "Report Comment", open the modal, select "Hate Speech & Racism", advance the screen, and halt for final manual review.
 
 ---
 

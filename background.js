@@ -1,4 +1,4 @@
-// Local regex rules for Option A testing
+// Local regex rules for Option A testing (focused on anti-Indian and anti-Hindu hate speech)
 const LOCAL_REGEX_RULES = [
   {
     pattern: /\b(hate speech test|this is a test hate speech comment)\b/i,
@@ -6,19 +6,19 @@ const LOCAL_REGEX_RULES = [
     reason: "Test keyword match"
   },
   {
-    pattern: /\b(go back to (your country|where (you|they) came from)|illegal alien|sub-?human)\b/i,
+    pattern: /\b(street-?shitter|pajeet|curry-?muncher|cow-?piss|cow-?dung|ganga-?bathing|cow-?worshipper)\b/i,
+    score: 0.95,
+    reason: "Anti-Indian/anti-Hindu derogatory slur detected"
+  },
+  {
+    pattern: /\b(dirty indian|smelly indian|scammer indian|scamming indians|indians are scammer|cow piss drinker)s?\b/i,
     score: 0.90,
-    reason: "Xenophobic trope detected"
+    reason: "Xenophobic generalization or slur detected"
   },
   {
-    pattern: /\b(racist|n-word|slurs?|white trash|dirty immigrant|colored people)\b/i,
-    score: 0.85,
-    reason: "Racial epithet or slur detected"
-  },
-  {
-    pattern: /\b(hate|despise|destroy|kill|hang|lynch)\s+all\s+(black|white|asian|hispanic|jewish|muslim|immigrant)s?\b/i,
-    score: 0.98,
-    reason: "Explicit hate speech / incitement to violence"
+    pattern: /\b(heathens?|pagans?|polytheists?|worship.*idols?|worship.*statues?|dirty pagans?)\s+should\s+(be converted|go to hell|burn|be wiped out|die)\b/i,
+    score: 0.95,
+    reason: "Anti-Hindu religious intolerance or incitement"
   }
 ];
 
@@ -66,7 +66,7 @@ async function callOpenAI(text, apiKey) {
       messages: [
         {
           role: 'system',
-          content: 'Analyze if this text contains explicit racism, xenophobia, or hate speech. Respond with a JSON object: {"isHateSpeech": boolean, "confidenceScore": float, "reason": string}. Note: confidenceScore should be a decimal between 0 and 1.'
+          content: 'Analyze if this text contains explicit racism, xenophobia, or hate speech targeting Indians, South Asians, or Hindus. Look out for slurs (e.g. pajeet, curry muncher, street shitter), xenophobic tropes about hygiene, accents, or scamming, and religious intolerance targeting Hinduism (e.g. mocking idol worship, cow worship, or incitement). Respond with a JSON object: {"isHateSpeech": boolean, "confidenceScore": float, "reason": string}. Note: confidenceScore should be a decimal between 0 and 1.'
         },
         {
           role: 'user',
@@ -98,7 +98,7 @@ async function callGemini(text, apiKey) {
     body: JSON.stringify({
       contents: [{
         parts: [{
-          text: `Analyze if this text contains explicit racism, xenophobia, or hate speech.\nText: "${text}"\nRespond ONLY with a valid JSON object matching this schema: {"isHateSpeech": boolean, "confidenceScore": float, "reason": string}. Do not add any markdown wrapper like \`\`\`json.`
+          text: `Analyze if this text contains explicit racism, xenophobia, or hate speech targeting Indians, South Asians, or Hindus. Look out for slurs (like pajeet, curry muncher, street shitter), xenophobic tropes about hygiene, accents, or scamming, and religious intolerance targeting Hinduism (like mocking idol worship, cow worship, or incitement).\nText: "${text}"\nRespond ONLY with a valid JSON object matching this schema: {"isHateSpeech": boolean, "confidenceScore": float, "reason": string}. Do not add any markdown wrapper like \`\`\`json.`
         }]
       }],
       generationConfig: {
