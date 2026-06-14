@@ -1,20 +1,20 @@
 # 🛡️ Semi-Automated Social Media Content Moderator (Anti-Indian/Anti-Hindu Filter)
 
-A premium Manifest V3 Chrome Extension designed to detect, highlight, and facilitate quick reporting of anti-Indian racism and anti-Hindu religious hate speech on major social platforms (like Reddit and X/Twitter). The extension fills a gap in platform-native moderation by targeting slurs, xenophobic tropes, and religious bigotry often missed by general moderation algorithms.
+A premium Manifest V3 Chrome Extension designed to detect, highlight, and facilitate quick reporting of anti-Indian racism and anti-Hindu religious hate speech on major social platforms (like Reddit and X/Twitter). 
+
+The classification engine is exclusively powered by **Google Gemini 1.5 Flash**, analyzing subtle contexts, slurs, xenophobia, and religious bigotry often missed by generic platform moderation algorithms.
 
 ---
 
 ## ✨ Features
 
 - **Manifest V3 Compliant**: Developed using service worker architecture and secure content scripts.
-- **Specialized Detection Engine**:
-  - **Option A (Local Check)**: Lightweight regex rules targeting common anti-Indian slurs (e.g. *pajeet*, *curry-muncher*, hygiene tropes) and anti-Hindu religious intolerance.
-  - **Option B (Cloud LLM)**: Connects to **OpenAI (GPT-4o-mini)** or **Google Gemini (Gemini 1.5 Flash)** with custom system prompts that direct the AI to analyze subtle context, xenophobia, and dog whistles targeting South Asian/Hindu demographics.
+- **AI Classification Layer**: Connects to **Google Gemini (Gemini 1.5 Flash)** with custom system prompts that instruct the model to scan for anti-Indian and anti-Hindu slurs (*pajeet*, *curry-muncher*, *street-shitter*, etc.), xenophobic stereotypes (hygiene, scamming), and religious bigotry (idol worship mockery, conversion threats).
 - **Real-Time Scanning**: Uses a debounced `MutationObserver` to automatically scan comments during scroll/navigation.
 - **Premium UI Highlights**: Visually tints violating comments in a soft translucent red and injects a "⚠️ Quick Report" button displaying the detection confidence.
 - **Human-in-the-Loop Report Automator**: Automatically clicks open options menus, selects "Hate Speech" in the native platform report flow, and halts right before final submission.
 - **Anti-Bot Avoidance**: Dispatches coordinates-based pointer events with randomized jitter delays.
-- **Local Testing Sandbox**: Includes a fully interactive sandbox (`demo.html`) pre-loaded with anti-Indian/anti-Hindu comments, neutral control comments, and simulated reporting modals.
+- **Local Testing Sandbox**: Includes a sandbox page (`demo.html`) pre-loaded with anti-Indian/anti-Hindu comments and neutral control comments to verify LLM accuracy.
 
 ---
 
@@ -22,14 +22,15 @@ A premium Manifest V3 Chrome Extension designed to detect, highlight, and facili
 
 ```text
 ├── manifest.json      # Extension configuration and permission declarations (MV3)
-├── background.js     # Service worker proxying LLM API calls and local rules
+├── background.js     # Service worker handling Gemini API fetch and classification logic
 ├── content.js        # Content script handling DOM scanning, highlighting, and automated clicking
 ├── styles.css        # Premium UI stylesheet for comment highlights & button injects
-├── options.html      # Sleek Outfit-font settings page to configure API keys & selectors
-├── options.js        # Logic to save/load configuration data in chrome.storage.local
+├── options.html      # Sleek Outfit-font settings page to configure your Gemini API Key
+├── options.js        # Logic to save/load Gemini settings in chrome.storage.local
 ├── popup.html        # Small extension action popup with active status toggles
 ├── popup.js          # Synchronizes status toggle with storage & informs content scripts
 ├── demo.html         # Local sandbox simulating social feeds & reporting flows
+├── LICENSE           # MIT License
 └── .gitignore        # Standard git ignore file
 ```
 
@@ -45,13 +46,21 @@ A premium Manifest V3 Chrome Extension designed to detect, highlight, and facili
 4. Click **Load unpacked** in the top-left corner.
 5. Select the root folder containing the extension files.
 
-### 2. Testing via the Sandbox (Recommended)
+### 2. Enter your Gemini API Key
 
-To safely test the extension without making edits on live social accounts:
-1. Double-click the `demo.html` file in the project folder to open it in Chrome.
-2. Observe the page. Comments 3 (anti-Indian slur/scam stereotype) and 5 (anti-Hindu religious bigotry) will automatically highlight, while comments 1, 2, and 4 (including positive and anti-racism references to India/Hinduism) remain untouched to verify there are no false positives.
-3. Click **⚠️ Quick Report** on either flagged comment. 
-4. Watch the script automatically click open the comment dropdown menu, select "Report Comment", open the modal, select "Hate Speech & Racism", advance the screen, and halt for final manual review.
+1. Click the extension puzzle piece icon 🧩 next to your profile picture.
+2. Click **Semi-Automated Content Moderator** to open the quick controls.
+3. Click **Configure Settings**.
+4. Paste your **Google Gemini API Key** and hit **Save Settings**. (Stored securely in `chrome.storage.local`).
+
+### 3. Testing via the Sandbox
+
+To safely test the extension's live classification:
+1. Open the sandbox file `demo.html` in Chrome:
+   `chrome-extension://<EXTENSION-ID>/demo.html` (Or double-click the file to open `file:///Users/bishwambharsen/Projects/Anti-racism%20Social%20Media%20Plugin/demo.html`).
+2. Observe the page. The extension will send the comment texts to Gemini.
+3. Anti-Indian/anti-Hindu comments will highlight, while positive and anti-hate references to India/Hinduism remain clean.
+4. Click **⚠️ Quick Report** on either flagged comment to watch the automated menu and modal selection flow!
 
 ---
 
@@ -59,16 +68,15 @@ To safely test the extension without making edits on live social accounts:
 
 Open the Extension Options Page by clicking the extension action icon -> **Configure Settings**:
 
-- **Classification Mode**: Select between local keyword rules (Option A) and Cloud LLMs (Option B).
-- **LLM Settings**: Choose your preferred provider (OpenAI or Gemini) and enter your API Key. (Stored securely in `chrome.storage.local`).
-- **Confidence Threshold**: Set a decimal threshold (e.g. `0.70`). Only comments flagged with equal or higher confidence will get highlighted.
+- **Google Gemini API Key**: Securely store your API key.
+- **Confidence Threshold**: Set a decimal threshold (e.g. `0.70`). Only comments flagged by Gemini with equal or higher confidence will get highlighted.
 - **Target CSS Selector**: Customize selector parameters if social platforms update their DOM structure (defaults match Reddit, X/Twitter, and the local sandbox).
 
 ---
 
 ## 🛡️ Anti-Bot Evasion Implementation
 
-To keep the moderator extension undetected by platform scrapers and anti-bot systems (like Cloudflare or in-house telemetry):
+To keep the moderator extension undetected by platform scrapers and anti-bot systems:
 
 1. **Simulated Event Chains**: Instead of executing standard `.click()` events, the automator dispatches a full pointer sequence: `mousedown` -> `mouseup` -> `click`.
 2. **Realistic Coordinates**: Event objects calculate element center positions dynamically, supplying accurate `clientX` and `clientY` coordinates.
@@ -80,4 +88,3 @@ To keep the moderator extension undetected by platform scrapers and anti-bot sys
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-

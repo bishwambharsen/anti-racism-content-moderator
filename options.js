@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const modeSelect = document.getElementById('mod-mode');
-  const llmSection = document.getElementById('llm-section');
-  const providerSelect = document.getElementById('llm-provider');
   const apiKeyInput = document.getElementById('api-key');
   const thresholdInput = document.getElementById('threshold');
   const thresholdVal = document.getElementById('threshold-val');
@@ -12,23 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Default values
   const defaults = {
-    mode: 'local',
-    provider: 'openai',
     apiKey: '',
     threshold: 0.70,
     selector: '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text'
   };
-
-  // Toggle LLM settings visibility
-  const toggleLlmSection = () => {
-    if (modeSelect.value === 'llm') {
-      llmSection.classList.remove('hidden');
-    } else {
-      llmSection.classList.add('hidden');
-    }
-  };
-
-  modeSelect.addEventListener('change', toggleLlmSection);
 
   // Update slider label
   thresholdInput.addEventListener('input', () => {
@@ -38,13 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load saved settings
   const loadSettings = () => {
     chrome.storage.local.get(defaults, (items) => {
-      modeSelect.value = items.mode;
-      providerSelect.value = items.provider;
       apiKeyInput.value = items.apiKey;
       thresholdInput.value = items.threshold;
       thresholdVal.textContent = parseFloat(items.threshold).toFixed(2);
       selectorInput.value = items.selector;
-      toggleLlmSection();
     });
   };
 
@@ -52,15 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
   settingsForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const settings = {
-      mode: modeSelect.value,
-      provider: providerSelect.value,
       apiKey: apiKeyInput.value.trim(),
       threshold: parseFloat(thresholdInput.value),
       selector: selectorInput.value.trim()
     };
 
-    if (settings.mode === 'llm' && !settings.apiKey) {
-      showStatus('API Key is required when using LLM mode!', 'error');
+    if (!settings.apiKey) {
+      showStatus('Gemini API Key is required!', 'error');
       return;
     }
 

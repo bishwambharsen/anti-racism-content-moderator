@@ -1,19 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
   const enabledToggle = document.getElementById('enabled-toggle');
-  const statusMode = document.getElementById('status-mode');
   const statusThreshold = document.getElementById('status-threshold');
   const openOptionsBtn = document.getElementById('open-options');
 
   const defaults = {
     enabled: true,
-    mode: 'local',
     threshold: 0.70
   };
 
   // Load current settings
   chrome.storage.local.get(defaults, (items) => {
     enabledToggle.checked = items.enabled;
-    statusMode.textContent = items.mode === 'llm' ? 'Cloud LLM' : 'Local Regex';
     statusThreshold.textContent = parseFloat(items.threshold).toFixed(2);
   });
 
