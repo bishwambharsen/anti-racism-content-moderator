@@ -1,6 +1,6 @@
-// Gemini API Call (Gemini 1.5 Flash)
+// Gemini API Call (Gemini 2.5 Flash)
 async function callGemini(text, apiKey) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {

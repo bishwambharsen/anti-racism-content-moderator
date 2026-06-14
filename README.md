@@ -2,14 +2,14 @@
 
 A premium Manifest V3 Chrome Extension designed to detect, highlight, and facilitate quick reporting of anti-Indian racism and anti-Hindu religious hate speech on major social platforms (like Reddit and X/Twitter). 
 
-The classification engine is exclusively powered by **Google Gemini 1.5 Flash**, analyzing subtle contexts, slurs, xenophobia, and religious bigotry often missed by generic platform moderation algorithms.
+The classification engine is exclusively powered by **Google Gemini 2.5 Flash**, analyzing subtle contexts, slurs, xenophobia, and religious bigotry often missed by generic platform moderation algorithms.
 
 ---
 
 ## ✨ Features
 
 - **Manifest V3 Compliant**: Developed using service worker architecture and secure content scripts.
-- **AI Classification Layer**: Connects to **Google Gemini (Gemini 1.5 Flash)** with custom system prompts that instruct the model to scan for anti-Indian and anti-Hindu slurs (*pajeet*, *curry-muncher*, *street-shitter*, etc.), xenophobic stereotypes (hygiene, scamming), and religious bigotry (idol worship mockery, conversion threats).
+- **AI Classification Layer**: Connects to **Google Gemini (Gemini 2.5 Flash)** with custom system prompts that instruct the model to scan for anti-Indian and anti-Hindu slurs (*pajeet*, *curry-muncher*, *street-shitter*, etc.), xenophobic stereotypes (hygiene, scamming), and religious bigotry (idol worship mockery, conversion threats).
 - **Real-Time Scanning**: Uses a debounced `MutationObserver` to automatically scan comments during scroll/navigation.
 - **Premium UI Highlights**: Visually tints violating comments in a soft translucent red and injects a "⚠️ Quick Report" button displaying the detection confidence.
 - **Human-in-the-Loop Report Automator**: Automatically clicks open options menus, selects "Hate Speech" in the native platform report flow, and halts right before final submission.
