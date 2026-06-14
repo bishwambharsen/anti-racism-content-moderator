@@ -12,19 +12,20 @@ if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
 
 // Configuration & States
 let isEnabled = true;
-let customSelector = '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text';
+let customSelector = '.comment, [data-testid="tweetText"], .reddit-comment, div[data-testid="comment"], shreddit-comment [id^="comment-content-"], .comment-body, .usertext-body, div[role="comment"] span[dir="auto"], ul li span';
 let confidenceThreshold = 0.70;
 let scanTimeout = null;
 
 // Load initial settings
 chrome.storage.local.get({
   enabled: true,
-  selector: '.comment, [data-testid="tweetText"], .reddit-comment, .mock-comment-text',
+  selector: '.comment, [data-testid="tweetText"], .reddit-comment, div[data-testid="comment"], shreddit-comment [id^="comment-content-"], .comment-body, .usertext-body, div[role="comment"] span[dir="auto"], ul li span',
   threshold: 0.70
 }, (items) => {
   isEnabled = items.enabled;
   customSelector = items.selector;
   confidenceThreshold = items.threshold;
+  console.log("Anti-Racism Content Reporter: Extension loaded on page. Active Selector:", customSelector);
   if (isEnabled) {
     initModerator();
   }
@@ -99,6 +100,14 @@ function scanNewComments() {
   if (!isEnabled) return;
 
   const commentTextElements = document.querySelectorAll(customSelector);
+  
+  // Log count of found items to page console for visual feedback
+  if (commentTextElements.length > 0) {
+    const unprocessed = Array.from(commentTextElements).filter(el => el.getAttribute('data-moderator-processed') !== 'true');
+    if (unprocessed.length > 0) {
+      console.log(`Anti-Racism Content Reporter: Scanning page... Found ${commentTextElements.length} comments total (${unprocessed.length} new unprocessed).`);
+    }
+  }
 
   commentTextElements.forEach(el => {
     // Avoid double processing
