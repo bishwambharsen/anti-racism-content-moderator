@@ -78,10 +78,6 @@ function getCommentContainer(el) {
   if (el.closest('article[data-testid="tweet"]')) {
     return el.closest('article[data-testid="tweet"]');
   }
-  // Mock Demo Page
-  if (el.closest('.mock-comment')) {
-    return el.closest('.mock-comment');
-  }
   // Reddit Shreddit (new Reddit)
   if (el.closest('shreddit-comment')) {
     return el.closest('shreddit-comment');
@@ -187,9 +183,7 @@ async function startAutomatedReport(container, button) {
   button.disabled = true;
 
   try {
-    if (container.classList.contains('mock-comment')) {
-      await runMockReportFlow(container, status);
-    } else if (container.tagName.toLowerCase() === 'shreddit-comment' || container.closest('shreddit-comment')) {
+    if (container.tagName.toLowerCase() === 'shreddit-comment' || container.closest('shreddit-comment')) {
       await runRedditReportFlow(container, status);
     } else if (container.closest('article[data-testid="tweet"]')) {
       await runXReportFlow(container, status);
@@ -209,43 +203,6 @@ async function startAutomatedReport(container, button) {
     }
     button.disabled = false;
   }
-}
-
-// Flow A: Mock Demo Page (`demo.html`) Automated Reporting
-async function runMockReportFlow(container, status) {
-  status.textContent = 'Opening options...';
-  const menuBtn = container.querySelector('.mock-menu-btn');
-  if (!menuBtn) throw new Error("Could not find options menu button.");
-  humanClick(menuBtn);
-
-  await sleep(600);
-
-  status.textContent = 'Selecting report option...';
-  const reportItem = container.querySelector('.mock-dropdown-item.report-trigger');
-  if (!reportItem) throw new Error("Could not find Report item in menu.");
-  humanClick(reportItem);
-
-  await sleep(800);
-
-  status.textContent = 'Selecting hate speech category...';
-  const modal = document.getElementById('mock-report-modal');
-  if (!modal) throw new Error("Report modal did not load.");
-  
-  const hateSpeechOption = modal.querySelector('input[value="hate_speech"]');
-  if (!hateSpeechOption) throw new Error("Could not find Hate Speech option.");
-  humanClick(hateSpeechOption);
-
-  await sleep(600);
-
-  status.textContent = 'Advancing...';
-  const nextBtn = modal.querySelector('.mock-btn-next');
-  if (!nextBtn) throw new Error("Could not find Next button in report modal.");
-  humanClick(nextBtn);
-
-  await sleep(600);
-
-  status.textContent = 'Ready for review! Click submit.';
-  status.className = 'moderator-report-status success';
 }
 
 // Flow B: Reddit Automated Reporting

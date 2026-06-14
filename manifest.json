@@ -26,11 +26,5 @@
   "action": {
     "default_popup": "popup.html"
   },
-  "options_page": "options.html",
-  "web_accessible_resources": [
-    {
-      "resources": ["demo.html", "styles.css", "content.js", "demo.js"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+  "options_page": "options.html"
 }

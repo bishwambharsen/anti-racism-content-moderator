@@ -14,7 +14,6 @@ The classification engine is exclusively powered by **Google Gemini 2.5 Flash**,
 - **Premium UI Highlights**: Visually tints violating comments in a soft translucent red and injects a "⚠️ Quick Report" button displaying the detection confidence.
 - **Human-in-the-Loop Report Automator**: Automatically navigates native report flows up to the final submit stage on Reddit and X/Twitter. For Facebook and Instagram, it provides structured alerts guiding you to complete reporting manually for account safety.
 - **Anti-Bot Avoidance**: Dispatches coordinates-based pointer events with randomized jitter delays.
-- **Local Testing Sandbox**: Includes a sandbox page (`demo.html`) pre-loaded with anti-Indian/anti-Hindu comments and neutral control comments to verify LLM accuracy.
 
 ---
 
@@ -29,7 +28,6 @@ The classification engine is exclusively powered by **Google Gemini 2.5 Flash**,
 ├── options.js        # Logic to save/load Gemini settings in chrome.storage.local
 ├── popup.html        # Small extension action popup with active status toggles
 ├── popup.js          # Synchronizes status toggle with storage & informs content scripts
-├── demo.html         # Local sandbox simulating social feeds & reporting flows
 ├── LICENSE           # MIT License
 └── .gitignore        # Standard git ignore file
 ```
@@ -53,14 +51,12 @@ The classification engine is exclusively powered by **Google Gemini 2.5 Flash**,
 3. Click **Configure Settings**.
 4. Paste your **Google Gemini API Key** and hit **Save Settings**. (Stored securely in `chrome.storage.local`).
 
-### 3. Testing via the Sandbox
+### 3. Try it Live!
 
-To safely test the extension's live classification:
-1. Open the sandbox file `demo.html` in Chrome:
-   `chrome-extension://<EXTENSION-ID>/demo.html` (Or double-click the file to open `file:///Users/bishwambharsen/Projects/Anti-racism%20Social%20Media%20Plugin/demo.html`).
-2. Observe the page. The extension will send the comment texts to Gemini.
-3. Anti-Indian/anti-Hindu comments will highlight, while positive and anti-hate references to India/Hinduism remain clean.
-4. Click **⚠️ Quick Report** on either flagged comment to watch the automated menu and modal selection flow!
+1. Open Facebook, Instagram, Reddit, or X/Twitter in Chrome.
+2. Ensure you have saved your Gemini API Key.
+3. Open any comment section or feed. Flagged comments will automatically highlight, showing the confidence score and injecting the quick report buttons.
+4. Click **⚠️ Quick Report** on any flagged comment to launch the automated flow (on Reddit/X) or show the manual guided alert (on Facebook/Instagram).
 
 ---
 
