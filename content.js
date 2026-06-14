@@ -95,12 +95,17 @@ function scanNewComments() {
     // Send comment to background worker for Gemini classification
     chrome.runtime.sendMessage({ action: 'analyzeText', text }, (response) => {
       if (chrome.runtime.lastError) {
-        console.warn("Moderator failed to contact background service:", chrome.runtime.lastError.message);
+        console.warn("Anti-Racism Content Reporter: Failed to contact background worker:", chrome.runtime.lastError.message);
         return;
       }
 
-      if (response && response.success && response.result.isFlagged) {
-        flagComment(el, response.result);
+      if (response && response.success) {
+        console.log(`Anti-Racism Content Reporter: Classification result for "${text.substring(0, 30)}...":`, response.result);
+        if (response.result.isFlagged) {
+          flagComment(el, response.result);
+        }
+      } else {
+        console.error("Anti-Racism Content Reporter: API classification failed:", response ? response.error : "No response");
       }
     });
   });
